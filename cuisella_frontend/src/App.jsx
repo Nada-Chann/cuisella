@@ -7,7 +7,8 @@ import LoginRegister from './pages/LoginRegister'
 import UserRecipes from './pages/UserRecipes'
 import AddRecipe from './pages/AddRecipe'
 import Favorites from './pages/Favorites'
-
+import EditRecipe from './pages/EditRecipe'
+import ViewRecipeDetails from './pages/ViewRecipeDetails'
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -32,6 +33,11 @@ function App() {
         <Route path="/my-recipes" element={<UserRecipes loggedInUser={loggedInUser} />} />
         <Route path="/favorites" element={<Favorites loggedInUser={loggedInUser} />} />
         <Route path="/add-recipe" element={<AddRecipe loggedInUser={loggedInUser} />} />
+        <Route path='/edit-recipe/:id' element={<EditRecipe loggedInUser={loggedInUser} />} />
+        <Route path="/recipes/:id" element={<ViewRecipeDetails />} />
+
+
+        
       </Routes>
     </Router>
   )

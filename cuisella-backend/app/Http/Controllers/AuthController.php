@@ -44,20 +44,24 @@ class AuthController extends Controller
         return $this->respondWithToken($user, 'Login successful');
     }
 
-    public function logout(Request $request)
-    {
-        try {
-            $request->user()->tokens()->delete();
-            Auth::guard('web')->logout();
-
-            return response()->json(['message' => 'Successfully logged out']);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'message' => 'Logout failed',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+   public function logout(Request $request)
+{
+    try {
+        // Revoke current user's token
+        $request->user()->currentAccessToken()->delete();
+        
+        // Logout from web session (if using)
+        Auth::guard('web')->logout();
+        
+        return response()->json(['message' => 'Successfully logged out']);
+    } catch (\Exception $e) {
+        \Log::error('Logout error: '.$e->getMessage());
+        return response()->json([
+            'message' => 'Logout failed',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function user(Request $request)
     {

@@ -20,35 +20,75 @@ const AddRecipe = () => {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
-    setIsSubmitting(true)
-    try {
-      const csrfResponse = await fetch("http://localhost:8000/sanctum/csrf-cookie", { credentials: "include", headers: { Accept: "application/json" } })
-      if (!csrfResponse.ok) throw new Error("Failed to establish secure session")
-      const ingredientsArray = form.ingredients.split("\n").filter((i) => i.trim())
-      const stepsArray = form.steps.split("\n").filter((i) => i.trim())
-      const formData = new FormData()
-      formData.append("title", form.title)
-      formData.append("description", form.description)
-      formData.append("time", form.time)
-      formData.append("servings", form.servings)
-      formData.append("ingredients", JSON.stringify(ingredientsArray))
-      formData.append("steps", JSON.stringify(stepsArray))
-      if (form.image) formData.append("image", form.image)
-      const res = await fetch("http://localhost:8000/api/recipes", { method: "POST", credentials: "include", headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" }, body: formData })
-      if (!res.ok) {
-        const errorData = await res.json()
-        const msg = errorData.errors ? Object.values(errorData.errors).flat().join(", ") : errorData.message || "Recipe submission failed"
-        throw new Error(msg)
-      }
-      navigate("/my-recipes")
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setIsSubmitting(false)
+  e.preventDefault();
+  setError("");
+  setIsSubmitting(true);
+  
+  try {
+    // 1. Get the auth token from localStorage
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      throw new Error("You need to be logged in to add a recipe");
     }
+
+    // 2. Get CSRF token first (required for Sanctum)
+    const csrfResponse = await fetch("http://localhost:8000/sanctum/csrf-cookie", {
+      credentials: "include",
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (!csrfResponse.ok) {
+      throw new Error("Failed to establish secure session");
+    }
+
+    // 3. Prepare the form data
+    const ingredientsArray = form.ingredients.split("\n").filter(i => i.trim());
+    const stepsArray = form.steps.split("\n").filter(i => i.trim());
+    
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    formData.append("time", form.time);
+    formData.append("servings", form.servings);
+    formData.append("ingredients", JSON.stringify(ingredientsArray));
+    formData.append("steps", JSON.stringify(stepsArray));
+    if (form.image) {
+      formData.append("image", form.image);
+    }
+
+    // 4. Make the request with authentication
+    const res = await fetch("http://localhost:8000/api/recipes", {
+      method: "POST",
+      credentials: "include", // Important for cookies/sessions
+      headers: {
+        'Authorization': `Bearer ${token}`, // Include the auth token
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: formData // FormData will automatically set Content-Type
+    });
+
+    // 5. Handle response
+    if (!res.ok) {
+      const errorData = await res.json();
+      const errorMsg = errorData.errors 
+        ? Object.values(errorData.errors).flat().join(", ") 
+        : errorData.message || "Recipe submission failed";
+      throw new Error(errorMsg);
+    }
+
+    // 6. Success - navigate to my recipes
+    navigate("/my-recipes");
+    
+  } catch (err) {
+    setError(err.message);
+    console.error("Recipe submission error:", err);
+  } finally {
+    setIsSubmitting(false);
   }
+};
 
   return (
     <div className="max-w-md mx-auto mt-32 bg-white p-8 rounded-xl shadow-lg">

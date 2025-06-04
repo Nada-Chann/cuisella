@@ -6,14 +6,23 @@ import logo from "../assets/logo.png"
 const Navbar = ({ loggedInUser, setLoggedInUser }) => {
   const [searchQuery, setSearchQuery] = useState("")
 
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:8000/api/logout", { method: "POST", credentials: "include" })
-      setLoggedInUser(null)
-    } catch (err) {
-      console.error("Logout failed:", err)
-    }
+ const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    await fetch("http://localhost:8000/api/logout", {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      },
+      credentials: "include"
+    });
+    localStorage.removeItem('auth_token');
+    setLoggedInUser(null);
+  } catch (err) {
+    console.error("Logout failed:", err);
   }
+}
 
   const handleSearch = (e) => {
     e.preventDefault()

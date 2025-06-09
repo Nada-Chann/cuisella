@@ -9,6 +9,7 @@ import AddRecipe from './pages/AddRecipe'
 import Favorites from './pages/Favorites'
 import EditRecipe from './pages/EditRecipe'
 import ViewRecipeDetails from './pages/ViewRecipeDetails'
+import Recipes from './pages/Recipes'
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -35,6 +36,8 @@ function App() {
         <Route path="/add-recipe" element={<AddRecipe loggedInUser={loggedInUser} />} />
         <Route path='/edit-recipe/:id' element={<EditRecipe loggedInUser={loggedInUser} />} />
         <Route path="/recipes/:id" element={<ViewRecipeDetails />} />
+        <Route path="/recipes" element={<Recipes />} />
+        
 
 
         

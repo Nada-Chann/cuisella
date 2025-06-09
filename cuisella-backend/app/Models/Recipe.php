@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Recipe extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
         'title',
@@ -17,21 +16,32 @@ class Recipe extends Model
         'steps',
         'time',
         'servings',
-         'image_path',
+        'image_path',
+        'tag',
     ];
 
-    // ensure Laravel casts `ingredients` and `steps` JSON ↔ array automatically
     protected $casts = [
         'ingredients' => 'array',
-        'steps'       => 'array',
+        'steps' => 'array',
     ];
-     public function getImageUrlAttribute()
-{
-    return $this->image_path ? asset('storage/'.$this->image_path) : null;
-}
-    // Recipe belongs to a User
-    public function user()
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function averageRating(): float
+    {
+        return $this->ratings()->avg('rating') ?? 0;
+    }
+
+    public function ratingCount(): int
+    {
+        return $this->ratings()->count();
     }
 }

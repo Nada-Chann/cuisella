@@ -22,4 +22,5 @@ export const addRecipe = recipeData => api.post('/recipes', recipeData)
 export const getMyRecipes = () => api.get('/my-recipes')
 export const getFavorites = () => api.get('/favorites')
 
+
 export default api

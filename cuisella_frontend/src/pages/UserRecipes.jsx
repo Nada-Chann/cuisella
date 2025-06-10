@@ -73,7 +73,7 @@ const UserRecipes = ({ loggedInUser }) => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-15 py-10">
             {recipes.map(recipe => (
             <div key={recipe.id} className="relative bg-[#F1EFEC] rounded-3xl shadow-md pt-24 px-5 pb-5 flex flex-col">
   {recipe.image_path && (
